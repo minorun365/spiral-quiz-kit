@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Python の基礎">
+
+<meta name="description" content="Python の基礎を10問前後ずつの周回で解く問題集の見本。">
+<meta name="theme-color" content="#0f5c58">
+<title>Python の基礎｜周回で解く21問</title>
+<style>
+:root{
+  --blue-deep:#0b3b38; --blue:#0f5c58; --blue-mid:#127a72; --blue-bright:#1aa596;
+  --blue-soft:#e8f5f3; --blue-line:#c6e6e1;
+  --blue-grad:linear-gradient(135deg,#0b3b38 0%,#0f5c58 50%,#14a090 100%);
+  --ink:#15151a; --sub:#4a4a54; --mut:#767680; --line:#e8e8ee; --soft:#f7f8fa;
+  --gold-deep:#8a5a00; --gold-soft:#fdf5e0; --gold-line:#f2e2b5;
+  --red:#a03030; --red-soft:#fdeaea; --red-line:#e0a8a8;
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%;background:var(--soft);overflow:hidden}
+html,body,button,a,label{touch-action:manipulation}
+body{font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+  color:var(--ink);font-size:15px;line-height:1.75;-webkit-font-smoothing:antialiased;
+  -webkit-text-size-adjust:100%;font-feature-settings:"palt" 1}
+button,select{font:inherit}
+
+/* ══ 1画面：上バー／カード（中だけスクロール）／下の操作バー ══ */
+.app{position:fixed;inset:0;display:flex;flex-direction:column;height:100dvh}
+.top{flex:none;background:var(--blue-grad);color:#fff;
+  padding:calc(env(safe-area-inset-top,0px) + 8px) max(16px,env(safe-area-inset-right,0px)) 8px max(16px,env(safe-area-inset-left,0px))}
+.top-row{display:flex;align-items:center;justify-content:center;gap:10px;min-height:44px}
+.top .ttl{font-size:14px;font-weight:700;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.top .cnt{font-size:12.5px;opacity:.85;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar{height:4px;background:rgba(255,255,255,.25);border-radius:4px;overflow:hidden;margin-top:6px}
+.bar i{display:block;height:100%;background:#fff;width:0;transition:width .3s ease}
+
+.main{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;touch-action:pan-y}
+.col{max-width:720px;margin:0 auto;padding:14px max(14px,env(safe-area-inset-left,0px)) 20px}
+
+.card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.card>h4{margin:0;padding:9px 16px;background:var(--soft);border-bottom:1px solid var(--line);
+  font-size:12px;font-weight:800;letter-spacing:.06em;color:var(--blue)}
+.card>h4 span{font-weight:600;color:var(--mut);margin-left:8px;letter-spacing:0}
+.card.lesson>h4{background:var(--blue-grad);color:#fff;border-bottom:0}
+.card.lesson>h4 span{color:#fff;opacity:.85}
+.card-body{padding:14px 16px 16px}
+
+.stem{font-size:15.5px;line-height:1.85;margin:0 0 12px;white-space:pre-line}
+.stem-tbl-w{overflow-x:auto;margin:6px 0 10px;-webkit-overflow-scrolling:touch}
+.stem-tbl{border-collapse:collapse;font-size:13.5px;line-height:1.5;white-space:normal;min-width:100%}
+.stem-tbl th,.stem-tbl td{border:1px solid var(--line);padding:6px 9px;text-align:left;vertical-align:top}
+.stem-tbl th{background:#eef6f5;font-weight:700;white-space:nowrap}
+.stem-tbl td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.stem-code{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12.5px;line-height:1.6;white-space:pre;overflow-x:auto;background:#f6f8fa;border:1px solid var(--line);border-radius:8px;padding:9px 11px;margin:6px 0 10px}
+.opts{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.opt{width:100%;display:flex;gap:10px;align-items:flex-start;text-align:left;font-size:14.5px;line-height:1.7;
+  color:var(--ink);background:#fff;border:1px solid var(--line);border-radius:12px;padding:11px 12px;cursor:pointer;
+  transition:border-color .15s ease,background .15s ease}
+.opt:hover{border-color:var(--blue-line)}
+.opt .k{flex:none;width:24px;height:24px;border-radius:50%;background:var(--soft);color:var(--sub);
+  font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;margin-top:1px}
+.opt .t{flex:1;min-width:0}
+.opt .tag{display:inline-block;margin-left:6px;font-size:10.5px;font-weight:800;border-radius:999px;padding:0 8px;vertical-align:1px}
+.opt[disabled]{cursor:default}
+.opt.ok{border-color:var(--blue);background:var(--blue-soft)}
+.opt.ok .k,.opt.ok .tag{background:var(--blue);color:#fff}
+.opt.ng{border-color:var(--red-line);background:var(--red-soft)}
+.opt.ng .k,.opt.ng .tag{background:var(--red);color:#fff}
+.opt.trap .tag{background:var(--gold-soft);color:var(--gold-deep);border:1px solid var(--gold-line)}
+.opt.dim{opacity:.55}
+.opt.sel{border-color:var(--blue-bright);background:#eef9f7}
+.opt.sel .k{background:var(--blue-bright);color:#fff}
+.multi-b{display:inline-block;font-size:12px;font-weight:800;color:var(--blue);background:var(--blue-soft);border:1px solid var(--blue-line);border-radius:999px;padding:1px 10px;margin:0 0 10px}
+.scn{margin:0 0 14px;border:1px solid var(--blue-line);border-radius:12px;background:#f6fbfa}
+.scn summary{cursor:pointer;padding:8px 14px;font-size:12.5px;font-weight:700;color:var(--blue);list-style:none}
+.scn summary::-webkit-details-marker{display:none}
+.scn summary::before{content:"▸ ";}
+.scn[open] summary::before{content:"▾ ";}
+.scn p{margin:0;padding:0 14px 12px;font-size:13.5px;line-height:1.8;color:var(--sub)}
+.mock-seg{margin-top:8px}
+.mock-seg[hidden]{display:none}
+.sp-box[hidden]{display:none}
+.sp-list{list-style:none;margin:6px 0 14px;padding:0;display:grid;gap:6px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.sp-list button{width:100%;text-align:left;font-size:13px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;line-height:1.5}
+.sp-list button.on{border-color:var(--blue-mid);box-shadow:inset 0 0 0 1px var(--blue-mid)}
+.sp-list button small{display:block;color:var(--mut);font-size:11.5px}
+.sp-list button.done small{color:#1a6b38;font-weight:700}
+.sp-acts{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+.sp-acts button{font-size:14px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:#fff;cursor:pointer;color:var(--ink)}
+.sp-acts button.go{background:var(--blue-grad);color:#fff;border:0;font-weight:700}
+.dom-b{display:inline-block;font-size:11.5px;color:var(--blue-deep);background:var(--blue-soft);border-radius:99px;padding:1px 9px;margin:0 0 8px}
+.mock-r{margin:10px 0 0;padding:0;list-style:none}
+.mock-r li{display:flex;justify-content:space-between;border-bottom:1px solid var(--line);padding:6px 0;font-size:14px}
+
+.exp{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+.verdict{font-weight:800;font-size:15px;margin:0 0 4px}
+.verdict.good{color:var(--blue)}
+.verdict.bad{color:var(--red)}
+.exp h5{margin:12px 0 2px;font-size:11.5px;letter-spacing:.08em;color:var(--mut);font-weight:800}
+.exp p{margin:0;font-size:14.5px;line-height:1.8;color:var(--sub)}
+
+.d-lead{font-size:15.5px;line-height:1.8;font-weight:700;color:var(--blue-deep);margin:0 0 12px}
+.pts{display:grid;gap:10px}
+.pt b{display:block;font-size:13px;color:var(--blue-deep)}
+.pt p{margin:0;font-size:14px;color:var(--sub);line-height:1.75}
+.pt.key b{color:var(--gold-deep)}
+
+.done-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:0 0 12px}
+.done-grid div{background:var(--soft);border-radius:12px;padding:10px 12px}
+.done-grid b{display:block;font-size:21px;color:var(--blue-deep);font-variant-numeric:tabular-nums}
+.done-grid span{font-size:11.5px;color:var(--mut)}
+.card-body p{margin:8px 0}
+
+/* ══ 下の操作バー ══ */
+.nav{flex:none;background:#fff;border-top:1px solid var(--line);
+  padding:10px max(14px,env(safe-area-inset-right,0px)) calc(10px + env(safe-area-inset-bottom,0px)) max(14px,env(safe-area-inset-left,0px))}
+.nav-in{max-width:720px;margin:0 auto;display:flex;gap:8px;align-items:center}
+.nav button{border-radius:12px;padding:12px 14px;font-size:14px;font-weight:700;cursor:pointer;
+  border:1px solid var(--line);background:#fff;color:var(--sub);min-height:46px}
+.nav button.go{flex:1;background:var(--blue-grad);color:#fff;border:0}
+.nav button:disabled{opacity:.4;cursor:default}
+.nav .menu-b{padding:12px 13px}
+
+/* ══ メニュー（下から出るシート） ══ */
+.sheet-bg{position:fixed;inset:0;background:rgba(10,12,30,.35);z-index:10;opacity:0;pointer-events:none;transition:opacity .2s ease}
+.sheet{position:fixed;left:0;right:0;bottom:0;z-index:11;background:#fff;border-radius:18px 18px 0 0;
+  max-height:86dvh;overflow-y:auto;overscroll-behavior:contain;transform:translateY(100%);transition:transform .25s ease;
+  padding:8px max(16px,env(safe-area-inset-right,0px)) calc(18px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.open .sheet-bg{opacity:1;pointer-events:auto}
+.open .sheet{transform:none}
+.sheet-in{max-width:720px;margin:0 auto}
+.grab{width:40px;height:4px;border-radius:4px;background:var(--line);margin:4px auto 12px}
+.sheet h6{margin:14px 0 6px;font-size:11.5px;letter-spacing:.1em;color:var(--mut);font-weight:800}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg button,.sheet select,.sheet .danger{width:100%;border:1px solid var(--line);background:#fff;color:var(--sub);
+  border-radius:12px;padding:11px 12px;font-size:14px;cursor:pointer}
+.seg button.on{border-color:var(--blue);background:var(--blue-soft);color:var(--blue);font-weight:700}
+.sheet .danger{margin-top:8px;color:var(--red)}
+.sync{font-size:12px;color:var(--mut);margin:10px 0 0}
+.sync.err{color:var(--gold-deep)}
+.stat{width:100%;border-collapse:collapse;font-size:13px}
+.stat td{padding:7px 4px;border-top:1px solid var(--line);vertical-align:top}
+.stat tr:first-child td{border-top:0}
+.stat td.n{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--sub)}
+.stat tr.weak td:first-child{color:var(--red);font-weight:700}
+.stat .h td{font-size:11px;color:var(--mut);font-weight:700}
+.note{font-size:11.5px;color:var(--mut);margin:12px 0 0;line-height:1.6}
+
+/* ══ 図（figHTML） ══ */
+.fig{margin:14px 0 4px;background:var(--soft);border:1px solid var(--line);border-radius:14px;padding:12px}
+.fig-cap{font-size:11.5px;font-weight:800;letter-spacing:.06em;color:var(--blue);margin:0 0 10px}
+.fb{background:#fff;border:1px solid var(--blue-line);border-radius:10px;padding:8px 10px;min-width:0}
+.fb b{display:block;font-size:13px;line-height:1.5;color:var(--blue-deep)}
+.fb small{display:block;font-size:12px;line-height:1.55;color:var(--sub);margin-top:2px}
+.fb.ok{border-color:var(--blue);background:var(--blue-soft)}
+.fb.ng{border-color:var(--red-line);background:var(--red-soft)}
+.fb.ng b{color:var(--red)}
+.fb.key{border-color:var(--gold-line);background:var(--gold-soft)}
+.fb.key b{color:var(--gold-deep)}
+.fl{display:flex;flex-direction:column;align-items:stretch}
+.ar{align-self:center;color:var(--blue-mid);font-size:15px;line-height:1;padding:4px 0;font-weight:800}
+.ar::before{content:"↓"}
+@media (min-width:640px){
+  .fl.h{flex-direction:row;align-items:stretch}
+  .fl.h>.fb{flex:1}
+  .fl.h>.ar{padding:0 5px}
+  .fl.h>.ar::before{content:"→"}
+}
+.fork{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.fork-ar{text-align:center;color:var(--blue-mid);font-weight:800;font-size:13px;padding:4px 0}
+.back{margin-top:8px;font-size:12px;color:var(--blue-mid);font-weight:700;text-align:center;
+  border:1px dashed var(--blue-line);border-radius:999px;padding:4px 10px;background:#fff}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.vs>div{border-radius:10px;padding:8px 10px;border:1px solid}
+.vs .n{background:var(--red-soft);border-color:var(--red-line)}
+.vs .o{background:var(--blue-soft);border-color:var(--blue)}
+.vs h6{margin:0 0 4px;font-size:12px;font-weight:800;line-height:1.45}
+.vs .n h6{color:var(--red)} .vs .o h6{color:var(--blue)}
+.vs ul{margin:0;padding-left:1.1em;font-size:12.5px;line-height:1.6;color:var(--sub)}
+.vs li+li{margin-top:3px}
+@media (max-width:380px){ .vs{grid-template-columns:1fr} }
+.lay{display:grid;gap:6px}
+.lay .fb{display:grid;grid-template-columns:minmax(6.5em,34%) 1fr;gap:8px;align-items:baseline}
+.lay .fb small{margin:0}
+.hub-top{max-width:420px;margin:0 auto;width:100%}
+.hub-kids{display:grid;grid-template-columns:repeat(auto-fit,minmax(118px,1fr));gap:6px}
+.mx{width:100%;border-collapse:separate;border-spacing:0;font-size:12.5px;line-height:1.5;background:#fff;
+  border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.mx th,.mx td{padding:6px 7px;border-top:1px solid var(--line);vertical-align:top;text-align:left}
+.mx tr:first-child th{border-top:0;background:var(--blue-soft);color:var(--blue-deep);font-size:11.5px}
+.mx td:first-child{font-weight:700;color:var(--ink)}
+.mx td{color:var(--sub)}
+.mx .y{color:var(--blue);font-weight:700} .mx .x{color:var(--red)} .mx .m{color:var(--gold-deep)}
+.bars{display:grid;gap:7px}
+.bar-r b{display:flex;justify-content:space-between;gap:8px;font-size:12.5px;color:var(--ink);font-weight:700}
+.bar-r b span{color:var(--sub);font-weight:600;font-variant-numeric:tabular-nums;white-space:nowrap}
+.bar-r i{display:block;height:10px;border-radius:6px;background:var(--blue-mid);margin-top:3px}
+.bar-r.ng i{background:var(--red)} .bar-r.key i{background:#d49a1c} .bar-r.ok i{background:var(--blue)}
+.bar-r small{display:block;font-size:11.5px;color:var(--mut);margin-top:2px}
+
+.rest{margin:4px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.rest li{font-size:14px;line-height:1.75;color:var(--sub);display:flex;gap:8px}
+.rest li b{flex:none;width:22px;height:22px;border-radius:50%;background:var(--soft);color:var(--sub);
+  font-size:11.5px;display:flex;align-items:center;justify-content:center;margin-top:3px}
+.exp .deep{background:var(--soft);border-radius:12px;padding:10px 12px;margin-top:4px}
+
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <header class="top">
+    <div class="top-row"><span class="ttl">Python の基礎</span><span class="cnt" id="cnt"></span></div>
+    <div class="bar"><i id="barFill"></i></div>
+  </header>
+  <main class="main" id="main"><div class="col" id="stage"></div></main>
+  <nav class="nav"><div class="nav-in">
+    <button type="button" class="menu-b" id="menuB" aria-label="メニュー">成績・設定</button>
+    <button type="button" id="prev">前へ</button>
+    <button type="button" class="go" id="next">次へ</button>
+  </div></nav>
+</div>
+
+<div class="sheet-bg" id="sheetBg"></div>
+<div class="sheet" id="sheet" role="dialog" aria-label="成績と設定"><div class="sheet-in">
+  <div class="grab"></div>
+  <div class="sp-box" id="spBox" hidden>
+    <h6>10問ずつの周回（押すと、最初から・続きから・間違えた問題だけを選べる）</h6>
+    <ul class="sp-list" id="spList"></ul>
+  </div>
+  <h6>解き方</h6>
+  <div class="seg">
+    <button type="button" data-mode="all">全問を通しで解く</button>
+    <button type="button" data-mode="wrong">間違えた問題だけ</button>
+  </div>
+  <div class="seg mock-seg" id="mockSeg" hidden>
+    <button type="button" data-mode="mock" id="mockB">本番形式で解く</button>
+  </div>
+  <h6>分野へ移動</h6>
+  <select id="jump" aria-label="分野へ移動"></select>
+  <h6 id="statHead">分野別の成績</h6>
+  <table class="stat"><tbody id="statBody"></tbody></table>
+  <p class="sync" id="sync">　</p>
+  <button type="button" class="danger" id="reset">記録を消して最初からやり直す</button>
+  <p class="note">見本の問題集。10問前後ずつの周に分けてあり、どの周も3分野を一通り回る。PCは 1〜5 で選択、← → でめくる。</p>
+</div></div>
+
+<script id="drill-data" type="application/json">{"key": "python-basics", "rateLabel": "", "sections": [{"id": "s1", "title": "データ型と演算", "rate": "", "n": 7, "scenario": ""}, {"id": "s2", "title": "制御構文と関数", "rate": "", "n": 7, "scenario": ""}, {"id": "s3", "title": "標準ライブラリ", "rate": "", "n": 7, "scenario": ""}], "cards": [{"type": "q", "id": "s1-1", "sec": "s1", "stem": "次のコードを実行したとき、最後に表示される値はどれか。\n  a = [1, 2, 3]\n  b = a\n  b.append(4)\n  print(len(a))", "opts": ["3", "4", "エラーになる", "7"], "ans": 1, "trap": 0, "why": "b = a はリストをコピーせず、同じリストに2つの名前を付けるだけ。b.append(4) は a が指すリストそのものを変えるので、len(a) は 4 になる。", "trapwhy": "3 になるのは b = a.copy() や b = list(a) のように、別のリストを作った場合。代入だけでは中身は共有される。", "deep": "「代入は名前を付けるだけ」は、リスト・辞書・集合のような変更できる型で効いてくる。関数の引数に渡したリストを関数の中で書き換えると、呼び出し側にも反映されるのも同じ理由。", "rest": {"2": "append はリストのメソッドで、正しく実行される。", "3": "要素の合計（1+2+3+4=10）とも違い、len は要素の数を返す。"}, "fig": {"k": "vs", "cap": "代入とコピー", "ng": {"t": "b = a", "items": ["同じリストを2つの名前で指す", "b を変えると a も変わる"]}, "ok": {"t": "b = a.copy()", "items": ["新しいリストを作る", "b を変えても a はそのまま"]}}, "order": [2, 3, 0, 1]}, {"type": "q", "id": "s1-2", "sec": "s1", "stem": "7 // 2 と 7 / 2 の結果の組み合わせとして正しいものはどれか。", "opts": ["3 と 3.5", "3.5 と 3", "3 と 3", "4 と 3.5"], "ans": 0, "trap": 3, "why": "// は切り捨ての割り算（整数どうしなら整数）、/ は常に小数（float）を返す割り算。", "trapwhy": "// は四捨五入ではなく、小さい側へ切り捨てる。7 // 2 は 4 ではなく 3。", "deep": "負の数では切り捨ての向きに注意する。-7 // 2 は -3 ではなく -4（小さい側へ切り捨てる）。", "rest": {"1": "順序が逆。", "2": "/ は整数どうしでも小数を返す。"}, "fig": null, "order": [2, 3, 1, 0]}, {"type": "q", "id": "s1-3", "sec": "s1", "stem": "変更できない（イミュータブルな）型の組み合わせはどれか。", "opts": ["list と dict", "tuple と str", "set と list", "dict と tuple"], "ans": 1, "trap": 3, "why": "tuple と str は作ったあとに中身を変えられない。文字列の置き換えは、新しい文字列を返している。", "trapwhy": "tuple は変更できないが、dict は変更できる。片方だけ合っている。", "deep": "辞書のキーや集合の要素にできるのは、ハッシュ値が変わらない型だけ。tuple はキーにできるが、list はできない。", "rest": {"0": "どちらも変更できる。", "2": "どちらも変更できる（frozenset は変更できない）。"}, "fig": null, "order": [1, 3, 0, 2]}, {"type": "q", "id": "s1-4", "sec": "s1", "stem": "0.1 + 0.2 == 0.3 の結果と、その理由として正しいものはどれか。", "opts": ["True。小数はそのまま足される", "False。2進数の小数で表すと誤差が出る", "エラー。小数は == で比べられない", "True。Python が自動で丸める"], "ans": 1, "trap": 3, "why": "0.1 や 0.2 は2進数で正確に表せず、足すと 0.30000000000000004 になる。比べるときは math.isclose を使う。", "trapwhy": "表示のときに短く丸めて見せることはあるが、比較の前に丸めはしない。", "deep": "お金のように誤差が許されない計算では decimal.Decimal を使う。", "rest": {"0": "多くの言語の浮動小数点数と同じく、誤差が出る。", "2": "== で比べること自体はできる。"}, "fig": null, "order": [3, 2, 0, 1]}, {"type": "q", "id": "s1-5", "sec": "s1", "stem": "空のときに False と判定されるものを2つ選べ。", "opts": ["[]（空のリスト）", "\"0\"（文字0の文字列）", "{}（空の辞書）", "\" \"（空白1文字の文字列）", "[0]（0だけのリスト）"], "ans": [0, 2], "trap": 1, "why": "空のコンテナ（リスト・辞書・文字列など）と、数値の 0、None が False と判定される。", "trapwhy": "\"0\" は1文字ある文字列なので True。数値の 0 と取り違えやすい。", "deep": "if items: と書けば「空でなければ」を表せる。len(items) > 0 と書くより Python らしい書き方とされる。", "rest": {"3": "空白も1文字なので True。", "4": "要素が1つあるリストなので True。"}, "fig": null, "order": [1, 3, 0, 4, 2]}, {"type": "q", "id": "s1-6", "sec": "s1", "stem": "\"abc\" * 2 の結果はどれか。", "opts": ["\"abcabc\"", "\"aabbcc\"", "エラーになる", "6"], "ans": 0, "trap": 1, "why": "文字列に整数を掛けると、その回数だけ繰り返した文字列になる。", "trapwhy": "1文字ずつ繰り返すのではなく、文字列全体を繰り返す。", "deep": "リストも同じで [0] * 3 は [0, 0, 0]。ただし [[]] * 3 は同じリストを3つ並べるので、1つを変えると全部変わる。", "rest": {"2": "文字列と整数の掛け算は定義されている。", "3": "長さではなく文字列が返る。"}, "fig": null, "order": [2, 1, 0, 3]}, {"type": "q", "id": "s1-7", "sec": "s1", "stem": "int(\"12\") + 3 の結果はどれか。", "opts": ["15", "\"123\"", "エラーになる", "\"15\""], "ans": 0, "trap": 1, "why": "int(\"12\") で文字列が整数の 12 になり、3 を足して 15。", "trapwhy": "\"12\" + \"3\" のように文字列どうしなら連結されて \"123\" になるが、ここでは先に整数へ直している。", "deep": "\"12\" + 3 のように型が違うまま足すと TypeError になる。Python は暗黙の型変換をしない。", "rest": {"2": "数字だけの文字列なので変換できる。", "3": "結果は整数で、文字列ではない。"}, "fig": null, "order": [3, 2, 1, 0]}, {"type": "q", "id": "s2-1", "sec": "s2", "stem": "次の関数を2回続けて呼んだとき、2回目の戻り値はどれか。\n  def add(x, items=[]):\n      items.append(x)\n      return items\n  add(1)\n  add(2)", "opts": ["[2]", "[1, 2]", "[]", "エラーになる"], "ans": 1, "trap": 0, "why": "引数の既定値は、関数を定義したときに1回だけ作られる。2回の呼び出しが同じリストを使い回すので、[1, 2] になる。", "trapwhy": "呼ぶたびに新しい空のリストが作られると思いがちだが、そうはならない。", "deep": "既定値には None を置き、関数の中で if items is None: items = [] と書くのが定番の書き方。", "rest": {"2": "1回目の append で要素が入っている。", "3": "文法上の誤りは無い。"}, "fig": {"k": "flow", "cap": "既定値が作られるタイミング", "steps": [{"t": "def を実行", "s": "ここで [] を1回だけ作る", "tone": "key"}, {"t": "add(1)", "s": "同じリストに 1 を足す", "tone": ""}, {"t": "add(2)", "s": "同じリストに 2 を足す", "tone": "ng"}], "end": [], "h": true}, "order": [2, 3, 1, 0]}, {"type": "q", "id": "s2-2", "sec": "s2", "stem": "range(1, 10, 3) が順に返す値はどれか。", "opts": ["1, 4, 7", "1, 4, 7, 10", "3, 6, 9", "1, 3, 5, 7, 9"], "ans": 0, "trap": 1, "why": "range(開始, 終了, 刻み) は終了の値を含まない。1 から 3 ずつ増やして、10 の手前で止まる。", "trapwhy": "終了の 10 は含まれない。", "deep": "終了を含まない決まりのおかげで、range(len(items)) がちょうど添字の範囲になる。", "rest": {"2": "開始は 1。", "3": "刻みは 3。"}, "fig": null, "order": [3, 0, 1, 2]}, {"type": "q", "id": "s2-3", "sec": "s2", "stem": "for 文の else 節が実行されるのはどんなときか。", "opts": ["ループが break されずに最後まで回ったとき", "ループが1回も回らなかったときだけ", "break されたとき", "例外が起きたとき"], "ans": 0, "trap": 1, "why": "for … else の else は「break で抜けなかったとき」に実行される。探し物が見つからなかったときの処理に使える。", "trapwhy": "1回も回らなかったときも実行されるが、それだけではない。最後まで回ったときも実行される。", "deep": "while 文にも同じ else 節がある。読み手が戸惑いやすいので、使うときはコメントを添えるとよい。", "rest": {"2": "break したときは実行されない。", "3": "例外のときは実行されない。"}, "fig": null, "order": [1, 3, 0, 2]}, {"type": "q", "id": "s2-4", "sec": "s2", "stem": "*args を受け取る関数の中で、args の型はどれか。", "opts": ["tuple", "list", "dict", "set"], "ans": 0, "trap": 1, "why": "位置引数の余りは tuple にまとまる。**kwargs のほうは dict になる。", "trapwhy": "中身を順に扱える点は list と同じだが、型は tuple。", "deep": "呼び出す側でも f(*items) と書くと、リストを展開して位置引数として渡せる。", "rest": {"2": "dict になるのは **kwargs。", "3": "順序と重複を保つので set ではない。"}, "fig": null, "order": [3, 1, 2, 0]}, {"type": "q", "id": "s2-5", "sec": "s2", "stem": "lambda x: x * 2 と同じ働きの関数はどれか。", "opts": ["def f(x): return x * 2", "def f(x): print(x * 2)", "def f(): return x * 2", "def f(x): x * 2"], "ans": 0, "trap": 3, "why": "lambda は式1つを返す小さな関数で、return を書かなくても式の値が戻り値になる。", "trapwhy": "def の中で式を書くだけでは値は返らない（戻り値は None）。", "deep": "sorted(items, key=lambda p: p.age) のように、その場で使う短い関数に向く。", "rest": {"1": "表示するだけで、戻り値は None。", "2": "引数 x を受け取っていない。"}, "fig": null, "order": [0, 1, 2, 3]}, {"type": "q", "id": "s2-6", "sec": "s2", "stem": "次のうち、ゼロ除算のときだけ 0 を返す書き方として適切なものはどれか。", "opts": ["try: r = a / b  except ZeroDivisionError: r = 0", "try: r = a / b  except: r = 0", "if b: r = a / b", "r = a / b or 0"], "ans": 0, "trap": 1, "why": "捕まえる例外を ZeroDivisionError に絞ると、それ以外の誤り（型の違いなど）は隠れずに表に出る。", "trapwhy": "except だけだと、すべての例外を飲み込む。想定外の誤りまで 0 にしてしまう。", "deep": "「何でも捕まえる except」は、後で原因を探しにくくする代表的な書き方。", "rest": {"2": "b が 0 のとき r が定義されないまま残る。", "3": "割り算の前に例外が起きるので or まで届かない。"}, "fig": null, "order": [3, 2, 1, 0]}, {"type": "q", "id": "s2-7", "sec": "s2", "stem": "関数の中で外側の変数 count に 1 を足したい。正しい書き方はどれか。\n  count = 0\n  def up():\n      ???\n      count += 1", "opts": ["global count", "local count", "import count", "何も書かなくてよい"], "ans": 0, "trap": 3, "why": "関数の中で代入すると、その名前は関数の中の変数として扱われる。外側（モジュール）の変数へ代入するには global を宣言する。", "trapwhy": "読むだけなら宣言は要らないが、+= は代入なので UnboundLocalError になる。", "deep": "入れ子の関数で外側の関数の変数を書き換えるときは nonlocal を使う。", "rest": {"1": "local という宣言は無い。", "2": "変数を取り込む文ではない。"}, "fig": null, "order": [3, 0, 1, 2]}, {"type": "q", "id": "s3-1", "sec": "s3", "stem": "ファイルを確実に閉じる書き方として適切なものはどれか。", "opts": ["with open(path) as f: …", "f = open(path) のあと、最後に f.close()", "open(path).read() だけ書く", "del f で消す"], "ans": 0, "trap": 1, "why": "with 文は、途中で例外が起きてもブロックを抜けるときに必ずファイルを閉じる。", "trapwhy": "途中で例外が起きると close() まで届かない。", "deep": "with はファイル以外にも、ロックやデータベースの接続など「後片付けが要るもの」に使える。", "rest": {"2": "閉じるタイミングを処理系に任せることになる。", "3": "名前を消すだけで、閉じる保証にはならない。"}, "fig": null, "order": [0, 1, 2, 3]}, {"type": "q", "id": "s3-2", "sec": "s3", "stem": "単語の出現回数を数えるのに最も手軽なものはどれか。", "opts": ["collections.Counter", "collections.deque", "itertools.chain", "functools.partial"], "ans": 0, "trap": 1, "why": "Counter(words) で、単語ごとの回数を持つ辞書のようなものができる。most_common(3) で上位も取れる。", "trapwhy": "deque は両端の出し入れが速い列で、数えるための道具ではない。", "deep": "dict.get(k, 0) + 1 で数える書き方もあるが、Counter のほうが意図が読み取りやすい。", "rest": {"2": "複数の並びをつなぐ道具。", "3": "引数を一部固定した関数を作る道具。"}, "fig": null, "order": [0, 3, 2, 1]}, {"type": "q", "id": "s3-3", "sec": "s3", "stem": "pathlib でファイル名から拡張子を取り出すには何を使うか。", "opts": ["Path(p).suffix", "Path(p).stem", "Path(p).name", "Path(p).parent"], "ans": 0, "trap": 1, "why": "suffix は \".txt\" のような拡張子を返す。", "trapwhy": "stem は拡張子を除いたファイル名（\"report\"）。", "deep": "\"a.tar.gz\" の suffix は \".gz\"。全部ほしいときは suffixes で [\".tar\", \".gz\"] が取れる。", "rest": {"2": "name は拡張子つきのファイル名。", "3": "parent はフォルダ。"}, "fig": null, "order": [0, 2, 1, 3]}, {"type": "q", "id": "s3-4", "sec": "s3", "stem": "JSON の文字列を Python の辞書に変えるのはどれか。", "opts": ["json.loads", "json.dumps", "json.load", "json.dump"], "ans": 0, "trap": 2, "why": "loads は文字列（s）から読む。dumps は辞書から文字列を作る。", "trapwhy": "load はファイルから読む関数で、文字列は受け取らない。", "deep": "日本語をそのまま書き出したいときは json.dumps(d, ensure_ascii=False)。", "rest": {"1": "向きが逆（辞書 → 文字列）。", "3": "辞書をファイルへ書き出す関数。"}, "fig": null, "order": [3, 1, 2, 0]}, {"type": "q", "id": "s3-5", "sec": "s3", "stem": "今日の日付だけを取るのに適切なものはどれか。", "opts": ["datetime.date.today()", "time.time()", "datetime.datetime.now().hour", "calendar.month(2026, 1)"], "ans": 0, "trap": 2, "why": "date.today() は年月日だけを持つ date を返す。", "trapwhy": "時刻を含む値から「時」だけを取り出していて、日付にはならない。", "deep": "タイムゾーンが関わる処理では datetime.now(tz=…) のようにタイムゾーンつきで扱う。", "rest": {"1": "1970年からの経過秒数の数値。", "3": "ある月のカレンダーを文字列で返す。"}, "fig": null, "order": [1, 2, 3, 0]}, {"type": "q", "id": "s3-6", "sec": "s3", "stem": "乱数の結果を毎回同じにしたいときに使うのはどれか。", "opts": ["random.seed", "random.shuffle", "random.choice", "random.sample"], "ans": 0, "trap": 1, "why": "seed に同じ値を与えると、そのあとの乱数の並びが毎回同じになる。テストの再現に使う。", "trapwhy": "shuffle は並べ替えるだけで、結果を固定する働きは無い。", "deep": "暗号やパスワードの生成には random ではなく secrets を使う。", "rest": {"2": "1つを選ぶ関数。", "3": "重複なしで複数を選ぶ関数。"}, "fig": null, "order": [2, 0, 3, 1]}, {"type": "q", "id": "s3-7", "sec": "s3", "stem": "リストの要素と添字を同時に取り出すのに使うのはどれか。", "opts": ["enumerate", "zip", "map", "filter"], "ans": 0, "trap": 1, "why": "for i, x in enumerate(items): で、添字と要素を同時に受け取れる。", "trapwhy": "zip は複数の並びを横に束ねる道具。zip(range(len(items)), items) でもできるが回りくどい。", "deep": "enumerate(items, start=1) で、添字を 1 から数え始められる。", "rest": {"2": "各要素に関数を当てる道具。", "3": "条件に合う要素だけを残す道具。"}, "fig": null, "order": [1, 2, 3, 0]}], "mock": null, "spiral": {"rounds": [["s1-1", "s2-1", "s3-1", "s1-2", "s2-2", "s3-2", "s1-3", "s2-3", "s3-3", "s1-4", "s2-4"], ["s3-4", "s1-5", "s2-5", "s3-5", "s1-6", "s2-6", "s3-6", "s1-7", "s2-7", "s3-7"]], "dom": {"s1-1": "データ型と演算", "s1-2": "データ型と演算", "s1-3": "データ型と演算", "s1-4": "データ型と演算", "s1-5": "データ型と演算", "s1-6": "データ型と演算", "s1-7": "データ型と演算", "s2-1": "制御構文と関数", "s2-2": "制御構文と関数", "s2-3": "制御構文と関数", "s2-4": "制御構文と関数", "s2-5": "制御構文と関数", "s2-6": "制御構文と関数", "s2-7": "制御構文と関数", "s3-1": "標準ライブラリ", "s3-2": "標準ライブラリ", "s3-3": "標準ライブラリ", "s3-4": "標準ライブラリ", "s3-5": "標準ライブラリ", "s3-6": "標準ライブラリ", "s3-7": "標準ライブラリ"}}, "sync": null}</script>
+<script>
+(function(){
+  var D = JSON.parse(document.getElementById('drill-data').textContent);
+  // 記録はブラウザの localStorage に保存する。build(sync=...) で保存APIを渡したときだけ、
+  // そのAPIへ GET / PUT して端末間で同期する（ブラウザだけのときは、ブラウザごとに別の記録になる）
+  var SHARE = !D.sync;
+  var LKEY = D.key + '-v1';
+  var API = D.sync ? D.sync.url : null;
+  var SYNC_HEADERS = (D.sync && D.sync.headers) || {};
+  var LET = ['A','B','C','D','E'];
+  var MOCK = D.mock || null;
+  var SP = D.spiral || null;
+  function isMulti(c){ return Array.isArray(c.ans); }
+  function hasAns(c, o){ return isMulti(c) ? c.ans.indexOf(o) >= 0 : c.ans === o; }
+  var sel = {};
+  var SCN_KEY = 'drill-scn-open';
+  var scnOpen = (function(){ try { var v = localStorage.getItem(SCN_KEY); if (v !== null) return v === '1'; } catch(e) {} return window.matchMedia('(min-width: 700px)').matches; })();
+  var secById = {}; D.sections.forEach(function(s,i){ s.no = i+1; secById[s.id] = s; });
+  var cardById = {}; D.cards.forEach(function(c){ cardById[c.id] = c; });
+  var qCards = D.cards.filter(function(c){ return c.type === 'q'; });
+
+  function blank(){ return {v:1, mode:'all', cur:D.cards[0].id, answers:{}, wrongDeck:[], pass:{}, touched:0, resetAt:0, mockSecs:[], mockAt:0, round:0, roundAt:{}, spInit:0, fix:null}; }
+  var S = blank();
+  try { var raw = localStorage.getItem(LKEY); if (raw) S = Object.assign(blank(), JSON.parse(raw)); } catch(e) {}
+
+  // 問題文：2字下げの行のかたまりを、列が2つ以上そろえば表（1行目が見出し）、そろわなければ等幅のコード枠にする
+  function stemHTML(s){
+    var out = [], buf = [], blk = [];
+    function flushText(){ if (buf.length) { out.push(esc(buf.join('\n'))); buf = []; } }
+    function flushBlk(){
+      if (!blk.length) return;
+      var rows = blk.map(function(l){ return l.trim().split(/\s{2,}/); });
+      var n = rows[0].length;
+      if (rows.length >= 2 && n >= 2 && rows.every(function(r){ return r.length === n; })) {
+        out.push('<div class="stem-tbl-w"><table class="stem-tbl"><tr>' + rows[0].map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr>' +
+          rows.slice(1).map(function(r){ return '<tr>' + r.map(function(c){ return '<td' + (/^[\d.,%]+$/.test(c) ? ' class="n"' : '') + '>' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('') +
+          '</table></div>');
+      } else {
+        out.push('<div class="stem-code">' + esc(blk.map(function(l){ return l.slice(2); }).join('\n')) + '</div>');
+      }
+      blk = [];
+    }
+    String(s).split('\n').forEach(function(l){
+      if (/^  \S|^   /.test(l)) { flushText(); blk.push(l); } else { flushBlk(); buf.push(l); }
+    });
+    flushText(); flushBlk();
+    return out.join('');
+  }
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]; }); }
+
+  // ── 端末とサーバーの統合：解答は問題ごとに新しいほう、現在地は最後に触った端末のもの
+  function merge(a, b){
+    var newer = (a.touched||0) >= (b.touched||0) ? a : b;
+    var out = Object.assign(blank(), newer, {answers:{}});
+    var ids = {}; Object.keys(a.answers||{}).concat(Object.keys(b.answers||{})).forEach(function(k){ ids[k]=1; });
+    Object.keys(ids).forEach(function(k){
+      var x = (a.answers||{})[k], y = (b.answers||{})[k];
+      out.answers[k] = !x ? y : !y ? x : ((x.at||0) >= (y.at||0) ? x : y);
+    });
+    // どちらかの端末で「やり直す」を押していたら、それより前の解答は捨てる
+    out.resetAt = Math.max(a.resetAt||0, b.resetAt||0);
+    Object.keys(out.answers).forEach(function(k){ if ((out.answers[k].at||0) < out.resetAt) delete out.answers[k]; });
+    // 周の解き直しの起点は、周ごとに新しいほうを採る。後から触った端末の古い起点で上書きすると、
+    // 解き直し中の周に前回の解答が「選んだ状態」で戻ってくる
+    out.roundAt = {};
+    [a.roundAt||{}, b.roundAt||{}].forEach(function(m){ Object.keys(m).forEach(function(r){ out.roundAt[r] = Math.max(out.roundAt[r]||0, m[r]||0); }); });
+    return out;
+  }
+
+  var syncEl = document.getElementById('sync');
+  function syncMsg(t, err){ syncEl.textContent = t; syncEl.className = 'sync' + (err ? ' err' : ''); }
+  function hhmm(){ var d=new Date(); return ('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2); }
+
+  var online = true, pushTimer = null, dirty = false, busy = false;
+  function saveLocal(){ try { localStorage.setItem(LKEY, JSON.stringify(S)); } catch(e) {} }
+  function touch(){ S.touched = Date.now(); saveLocal(); dirty = true; clearTimeout(pushTimer); pushTimer = setTimeout(push, 700); }
+
+
+  function pull(){
+    if (SHARE) return Promise.resolve(null);
+    return fetch(API, {credentials:'same-origin', cache:'no-store'}).then(function(r){
+      if (r.status === 401) { online = false; syncMsg('保存先にログインしていないため、この端末にだけ保存中', true); return null; }
+      if (!r.ok) throw new Error(r.status);
+      online = true; return r.json();
+    });
+  }
+  function push(){
+    if (!online || busy) return;
+    busy = true;
+    pull().then(function(remote){
+      if (!remote) return;
+      if (remote.state) S = merge(S, remote.state);
+      saveLocal();
+      var body = JSON.stringify({state:S});
+      return fetch(API, {method:'PUT', credentials:'same-origin', headers:Object.assign({'content-type':'application/json'}, SYNC_HEADERS), body:body}).then(function(r){ if (!r.ok) throw new Error(r.status); dirty = false; syncMsg('サーバーに保存済み（' + hhmm() + '）'); });
+    }).catch(function(e){ syncMsg('サーバーへ保存できず、端末に一時保存中（' + (e && e.message || '通信エラー') + '）。つながったら自動で送る', true); })
+      .then(function(){ busy = false; });
+  }
+  function refresh(){
+    if (SHARE) { syncMsg('記録はこのブラウザにだけ保存しています。別の端末やブラウザで開くと、最初からになります'); return; }
+    pull().then(function(remote){
+      if (!remote) return;
+      var before = S.cur;
+      if (remote.state) S = merge(S, remote.state);
+      saveLocal(); render(before !== S.cur);
+      if (dirty || !remote.state) push(); else syncMsg('サーバーと同期済み（' + hhmm() + '）');
+    }).catch(function(){ syncMsg('通信できないため端末の進捗で表示中', true); });
+  }
+  window.addEventListener('online', function(){ online = true; push(); });
+  document.addEventListener('visibilitychange', function(){
+    if (document.visibilityState === 'visible') refresh();
+    else if (dirty) push();
+  });
+
+  // ── デッキ
+  function deck(){
+    if (S.mode === 'wrong') return S.wrongDeck.filter(function(id){ return cardById[id]; }).map(function(id){ return cardById[id]; });
+    if (S.mode === 'spiral') return SP.rounds[S.round].map(function(id){ return cardById[id]; }).filter(Boolean);
+    if (S.mode === 'spfix') return S.fix.ids.map(function(id){ return cardById[id]; }).filter(Boolean);
+    if (S.mode === 'mock') return qCards.filter(function(c){ return (S.mockSecs||[]).indexOf(c.sec) >= 0; }).slice(0, MOCK ? MOCK.scenarios * MOCK.per : undefined);
+    return D.cards;
+  }
+  function revealed(c){
+    var a = S.answers[c.id]; if (!a) return null;
+    if (S.mode === 'wrong' && !S.pass[c.id]) return null;
+    if (S.mode === 'mock' && (a.at||0) < (S.mockAt||0)) return null;
+    if (S.mode === 'spiral' && (a.at||0) < ((S.roundAt||{})[S.round]||0)) return null;
+    if (S.mode === 'spfix' && (a.at||0) < (S.fix.at||0)) return null;
+    return a;
+  }
+  function curIndex(dk){
+    for (var i=0;i<dk.length;i++) if (dk[i].id === S.cur) return i;
+    return S.cur === '__done' ? dk.length : 0;
+  }
+
+  var stage = document.getElementById('stage'), main = document.getElementById('main');
+
+  // ── 図。drillkit/figs.py が組んだ dict をHTMLにする
+  function box(x){
+    return '<div class="fb' + (x.tone ? ' ' + x.tone : '') + '"><b>' + esc(x.t) + '</b>' + (x.s ? '<small>' + esc(x.s) + '</small>' : '') + '</div>';
+  }
+  function chain(list, h){
+    return '<div class="fl' + (h ? ' h' : '') + '">' + list.map(box).join('<span class="ar" aria-hidden="true"></span>') + '</div>';
+  }
+  function cell(v){
+    var t = String(v), cls = t.charAt(0) === '○' ? 'y' : t.charAt(0) === '×' ? 'x' : t.charAt(0) === '△' ? 'm' : '';
+    return '<td' + (cls ? ' class="' + cls + '"' : '') + '>' + esc(t) + '</td>';
+  }
+  function figHTML(f){
+    if (!f) return '';
+    var b = '';
+    if (f.k === 'flow') {
+      b = chain(f.steps, f.h && !f.end.length);
+      if (f.end.length) b += '<div class="fork-ar" aria-hidden="true">↓ 分かれる</div><div class="fork">' + f.end.map(box).join('') + '</div>';
+    } else if (f.k === 'cycle') {
+      b = chain(f.steps, false) + '<div class="back">↺ ' + esc(f.back) + '</div>';
+    } else if (f.k === 'vs') {
+      var li = function(xs){ return '<ul>' + xs.map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>'; };
+      b = '<div class="vs"><div class="n"><h6>× ' + esc(f.ng.t) + '</h6>' + li(f.ng.items) + '</div>' +
+          '<div class="o"><h6>○ ' + esc(f.ok.t) + '</h6>' + li(f.ok.items) + '</div></div>';
+    } else if (f.k === 'layers') {
+      b = '<div class="lay">' + f.rows.map(box).join('') + '</div>';
+    } else if (f.k === 'hub') {
+      b = '<div class="fl"><div class="hub-top">' + box(f.top) + '</div><span class="ar" aria-hidden="true"></span>' +
+          '<div class="hub-kids">' + f.kids.map(box).join('') + '</div>' +
+          (f.bottom ? '<span class="ar" aria-hidden="true"></span><div class="hub-top">' + box(f.bottom) + '</div>' : '') + '</div>';
+    } else if (f.k === 'matrix') {
+      b = '<table class="mx"><tr>' + f.cols.map(function(c){ return '<th>' + esc(c) + '</th>'; }).join('') + '</tr>' +
+          f.rows.map(function(r){ return '<tr>' + r.map(cell).join('') + '</tr>'; }).join('') + '</table>';
+    } else if (f.k === 'bars') {
+      var mx = Math.max.apply(null, f.items.map(function(i){ return i.v; })) || 1;
+      b = '<div class="bars">' + f.items.map(function(i){
+        return '<div class="bar-r' + (i.tone ? ' ' + i.tone : '') + '"><b>' + esc(i.t) + '<span>' + esc(i.v) + esc(f.unit) + '</span></b>' +
+          '<i style="width:' + Math.max(3, Math.round(i.v * 100 / mx)) + '%"></i>' + (i.s ? '<small>' + esc(i.s) + '</small>' : '') + '</div>';
+      }).join('') + '</div>';
+    }
+    return '<figure class="fig">' + (f.cap ? '<p class="fig-cap">' + esc(f.cap) + '</p>' : '') + b + '</figure>';
+  }
+  function rateTxt(r){ return D.rateLabel && r ? '・' + D.rateLabel + ' ' + esc(r) : ''; }
+
+  function lessonHTML(c){
+    var s = secById[c.sec];
+    var pts = c.points.map(function(p,i){
+      return '<div class="pt' + (i === c.points.length-1 ? ' key' : '') + '"><b>' + esc(p[0]) + '</b><p>' + esc(p[1]) + '</p></div>';
+    }).join('');
+    // 図は1枚目をリードの直後（全体像）、2枚目以降を要点のあと（補足）に置く
+    var figs = c.figs || [];
+    return '<div class="card lesson"><h4>解説 ' + s.no + '／' + D.sections.length + '<span>' + esc(c.title) + rateTxt(c.rate) + '</span></h4>' +
+      '<div class="card-body"><p class="d-lead">' + esc(c.lead) + '</p>' + figHTML(figs[0]) +
+      '<div class="pts" style="margin-top:14px">' + pts + '</div>' + figs.slice(1).map(figHTML).join('') + '</div></div>';
+  }
+  function questionHTML(c){
+    var s = secById[c.sec], a = revealed(c);
+    var opts = c.order.map(function(orig, i){
+      var cls = 'opt', tag = '';
+      var picked = Array.isArray(a && a.c) ? a.c.indexOf(orig) >= 0 : (a && a.c === orig);
+      if (a) {
+        if (hasAns(c, orig)) { cls += ' ok'; tag = picked ? '正解・あなたの選択' : '正解'; }
+        else if (picked) { cls += ' ng'; tag = 'あなたの選択'; }
+        else if (orig === c.trap) { cls += ' trap'; tag = '次点'; }
+        else cls += ' dim';
+      } else if ((sel[c.id]||[]).indexOf(orig) >= 0) cls += ' sel';
+      return '<li><button type="button" class="' + cls + '" data-o="' + orig + '"' + (a ? ' disabled' : '') + '>' +
+        '<span class="k">' + LET[i] + '</span><span class="t">' + esc(c.opts[orig]) +
+        (tag ? '<span class="tag">' + tag + '</span>' : '') + '</span></button></li>';
+    }).join('');
+    var exp = '';
+    if (a) {
+      var ansL = (isMulti(c) ? c.ans : [c.ans]).map(function(o){ return c.order.indexOf(o); }).sort().map(function(i){ return LET[i]; }).join(' と '), trapL = LET[c.order.indexOf(c.trap)];
+      var rest = c.order.map(function(orig, i){ return {orig:orig, L:LET[i]}; })
+        .filter(function(x){ return !hasAns(c, x.orig) && x.orig !== c.trap && c.rest[x.orig]; })
+        .map(function(x){ return '<li><b>' + x.L + '</b><span>' + esc(c.rest[x.orig]) + '</span></li>'; }).join('');
+      exp = '<div class="exp" id="exp"><p class="verdict ' + (a.ok ? 'good' : 'bad') + '">' + (a.ok ? '正解' : '不正解') + '　正解は ' + ansL + '</p>' +
+        '<h5>なぜ ' + ansL + ' か</h5><p>' + esc(c.why) + '</p>' +
+        figHTML(c.fig) +
+        '<h5>次点の ' + trapL + ' が落ちる理由</h5><p>' + esc(c.trapwhy) + '</p>' +
+        (rest ? '<h5>残りの選択肢</h5><ul class="rest">' + rest + '</ul>' : '') +
+        (c.deep ? '<h5>もう一歩踏み込む</h5><p class="deep">' + esc(c.deep) + '</p>' : '') +
+        (a.tries > 1 ? '<h5>記録</h5><p>' + a.tries + '回目の解答。初回は' + (a.first ? '正解' : '不正解') + '</p>' : '') + '</div>';
+    }
+    // 番号と分母は、いま解いている束の中で数える（全問の通しだけが全問ぶん）
+    var dkq = S.mode === 'all' ? qCards : deck().filter(function(x){ return x.type === 'q'; });
+    return '<div class="card"><h4>問題 ' + (dkq.indexOf(c) + 1) + '／' + dkq.length + '<span>' + esc(s.title) + '</span></h4>' +
+      '<div class="card-body">' + (SP && SP.dom[c.id] && SP.dom[c.id] !== s.title ? '<span class="dom-b">分野：' + esc(SP.dom[c.id]) + '</span>' : '') + (s.scenario ? '<details class="scn"' + (scnOpen ? ' open' : '') + '><summary>シナリオ：' + esc(s.title) + '</summary><p>' + esc(s.scenario) + '</p></details>' : '') +
+      '<div class="stem">' + stemHTML(c.stem) + '</div>' + (isMulti(c) && !a ? '<span class="multi-b">' + c.ans.length + 'つ選ぶ（選択中 ' + (sel[c.id]||[]).length + '）</span>' : '') +
+      '<ol class="opts">' + opts + '</ol>' + exp + '</div></div>';
+  }
+  function mockDoneHTML(){
+    var dk = deck(), ok = 0, ans = 0, per = {};
+    dk.forEach(function(c){
+      var a = S.answers[c.id], r = per[c.sec] || (per[c.sec] = {ok:0, n:0}); r.n++;
+      if (a && (a.at||0) >= (S.mockAt||0)) { ans++; if (a.ok) { ok++; r.ok++; } }
+    });
+    var rows = (S.mockSecs||[]).map(function(id){ var r = per[id] || {ok:0,n:0}; return '<li><span>' + esc(secById[id].title) + '</span><b>' + r.ok + '/' + r.n + '</b></li>'; }).join('');
+    return '<div class="card lesson"><h4>本番形式を1回解き終えた</h4><div class="card-body">' +
+      '<div class="done-grid"><div><b>' + ok + '/' + dk.length + '</b><span>正解</span></div><div><b>' + pct(ok, dk.length) + '</b><span>正答率</span></div><div><b>' + ans + '/' + dk.length + '</b><span>解答</span></div></div>' +
+      '<ul class="mock-r">' + rows + '</ul>' +
+      '<p>「成績・設定」の「本番形式で解く」を押すと、別の分野の組み合わせでもう1回解ける。</p></div></div>';
+  }
+  function roundStat(r){
+    var at = (S.roundAt||{})[r]||0, ok = 0, ans = 0;
+    SP.rounds[r].forEach(function(id){ var a = S.answers[id]; if (a && (a.at||0) >= at) { ans++; if (a.ok) ok++; } });
+    return {ok:ok, ans:ans, n:SP.rounds[r].length};
+  }
+  // その周で、いちばん新しい解答が不正解の問題
+  function roundMiss(r){ return SP.rounds[r].filter(function(id){ var a = S.answers[id]; return a && !a.ok; }); }
+  function domList(ids){
+    var doms = {}; ids.forEach(function(id){ var d = SP.dom[id] || '―'; doms[d] = (doms[d]||0) + 1; });
+    return Object.keys(doms).map(function(d){ return '<li><span>' + esc(d) + '</span><b>' + doms[d] + '問</b></li>'; }).join('');
+  }
+  // 周の終わりの行き先。間違いが残っていれば「解き直す」を主ボタンにし、無ければ次の周を主ボタンにする
+  function spActs(r, miss){
+    var last = r >= SP.rounds.length - 1;
+    return '<div class="sp-acts">' +
+      (miss.length ? '<button type="button" class="go" data-act="fix-round">間違えた ' + miss.length + ' 問を解き直す</button>' : '') +
+      (last ? '' : '<button type="button"' + (miss.length ? '' : ' class="go"') + ' data-act="next-round">第' + (r+2) + '周へ進む</button>') +
+      '<button type="button" data-act="redo-round">この周を最初から解き直す</button></div>';
+  }
+  // 周の入口。一覧から周を押したら、まずここで解き方を選ぶ（いきなり途中の問題へ飛ばさない）
+  function spIntroHTML(){
+    var r = S.round, st = roundStat(r), miss = roundMiss(r);
+    var btns = [];
+    if (!st.ans) btns.push('<button type="button" class="go" data-act="redo-round">第' + (r+1) + '周を始める</button>');
+    else {
+      btns.push('<button type="button" class="go" data-act="redo-round">最初から解き直す（' + st.n + '問すべて未回答に戻す）</button>');
+      if (st.ans < st.n) btns.push('<button type="button" data-act="resume-round">続きから（' + st.ans + '/' + st.n + '問 解答済み）</button>');
+      if (miss.length) btns.push('<button type="button" data-act="fix-round">間違えた ' + miss.length + ' 問だけ解き直す</button>');
+    }
+    return '<div class="card lesson"><h4>第' + (r+1) + '周<span>全' + SP.rounds.length + '周</span></h4><div class="card-body">' +
+      '<div class="done-grid"><div><b>' + st.ans + '/' + st.n + '</b><span>解答</span></div><div><b>' + st.ok + '</b><span>正解</span></div><div><b>' + miss.length + '</b><span>不正解</span></div></div>' +
+      '<p>解き方を選ぶ。「最初から解き直す」を選ぶと、この周の問題がすべて未回答の状態から始まる（これまでの記録は成績に残る）。</p>' +
+      '<div class="sp-acts">' + btns.join('') + '</div></div></div>';
+  }
+  function spDoneHTML(){
+    var r = S.round, st = roundStat(r), last = r >= SP.rounds.length - 1, miss = roundMiss(r), dl = domList(miss);
+    return '<div class="card lesson"><h4>第' + (r+1) + '周を解き終えた<span>全' + SP.rounds.length + '周</span></h4><div class="card-body">' +
+      '<div class="done-grid"><div><b>' + st.ok + '/' + st.n + '</b><span>正解</span></div><div><b>' + pct(st.ok, st.n) + '</b><span>正答率</span></div><div><b>' + (r+1) + '/' + SP.rounds.length + '</b><span>周</span></div></div>' +
+      (dl ? '<p>間違えた問題の分野</p><ul class="mock-r">' + dl + '</ul>' : '<p>この周は全問正解。</p>') +
+      (miss.length ? '' : '<p>' + (last ? '全周を解き終えた。' : '次の周もすべての分野を一通り回る。時間が無ければここで切り上げてよい。') + '</p>') +
+      spActs(r, miss) + '</div></div>';
+  }
+  function spFixDoneHTML(){
+    var r = S.fix.r, ids = S.fix.ids, ok = 0;
+    ids.forEach(function(id){ var a = S.answers[id]; if (a && a.ok && (a.at||0) >= S.fix.at) ok++; });
+    var miss = roundMiss(r), dl = domList(miss);
+    return '<div class="card lesson"><h4>第' + (r+1) + '周の解き直しを終えた</h4><div class="card-body">' +
+      '<div class="done-grid"><div><b>' + ok + '/' + ids.length + '</b><span>今回の正解</span></div><div><b>' + miss.length + '</b><span>残りの不正解</span></div><div><b>' + (r+1) + '/' + SP.rounds.length + '</b><span>周</span></div></div>' +
+      (dl ? '<p>まだ間違えている問題の分野</p><ul class="mock-r">' + dl + '</ul>' : '<p>第' + (r+1) + '周の問題は、すべて正解になった。</p>') +
+      spActs(r, miss) + '</div></div>';
+  }
+  function doneHTML(){
+    if (S.mode === 'spiral') return spDoneHTML();
+    if (S.mode === 'spfix') return spFixDoneHTML();
+    if (S.mode === 'mock') return mockDoneHTML();
+    var st = stats(), wrong = qCards.filter(function(c){ var a=S.answers[c.id]; return a && !a.ok; }).length;
+    return '<div class="card lesson"><h4>' + (S.mode === 'wrong' ? '解き直しを1周した' : 'ひととおり終わった') + '</h4><div class="card-body">' +
+      '<div class="done-grid"><div><b>' + st.answered + '/' + qCards.length + '</b><span>解答</span></div>' +
+      '<div><b>' + pct(st.ok, st.answered) + '</b><span>最新の正答率</span></div>' +
+      '<div><b>' + pct(st.first, st.answered) + '</b><span>初回の正答率</span></div></div>' +
+      '<p>' + (wrong ? '不正解のまま残っている問題が ' + wrong + ' 問。「成績・設定」の「間違えた問題だけ」で、分野の解説カードと一緒に解き直せる。' : 'すべて正解の状態。日を置いて「最初からやり直す」で初回の正答率を測り直す。') + '</p></div></div>';
+  }
+
+  function pct(a,b){ return b ? Math.round(a*100/b) + '%' : '―'; }
+  function stats(sec){
+    var r = {answered:0, ok:0, first:0, n:0};
+    qCards.forEach(function(c){
+      if (sec && c.sec !== sec) return;
+      r.n++; var a = S.answers[c.id]; if (!a) return;
+      r.answered++; if (a.ok) r.ok++; if (a.first) r.first++;
+    });
+    return r;
+  }
+
+  var barFill = document.getElementById('barFill'), cnt = document.getElementById('cnt');
+  var prevB = document.getElementById('prev'), nextB = document.getElementById('next');
+
+  function render(toTop){
+    var dk = deck(), i = curIndex(dk), c = dk[i];
+    if (S.mode === 'spiral' && S.cur === '__intro') {
+      stage.innerHTML = spIntroHTML();
+      cnt.textContent = '第' + (S.round+1) + '周'; prevB.disabled = true; nextB.disabled = true; nextB.textContent = '次へ'; barFill.style.width = '0%';
+    } else if (S.mode === 'wrong' && !dk.length) {
+      stage.innerHTML = '<div class="card"><h4>解き直す問題はない</h4><div class="card-body"><p>不正解のまま残っている問題が無い。「成績・設定」から「通しで解く」へ戻る。</p></div></div>';
+      cnt.textContent = ''; prevB.disabled = true; nextB.disabled = true; barFill.style.width = '100%';
+    } else {
+      stage.innerHTML = c ? (c.type === 'lesson' ? lessonHTML(c) : questionHTML(c)) : doneHTML();
+      cnt.textContent = (S.mode === 'wrong' ? '解き直し ' : S.mode === 'mock' ? '本番形式 ' : S.mode === 'spiral' ? '第' + (S.round+1) + '周 ' : S.mode === 'spfix' ? '第' + (S.round+1) + '周 解き直し ' : '') + (c ? (i+1) + '/' + dk.length : '完了');
+      prevB.disabled = i === 0;
+      nextB.disabled = !c;
+      nextB.textContent = c && c.type === 'q' && !revealed(c) ? 'とばす' : '次へ';
+      barFill.style.width = Math.round(Math.min(i + (c ? 0 : 1), dk.length) * 100 / dk.length) + '%';
+    }
+    document.querySelectorAll('[data-mode]').forEach(function(b){ b.classList.toggle('on', b.getAttribute('data-mode') === S.mode); });
+    renderStats();
+    if (toTop) main.scrollTop = 0;
+  }
+
+  function renderSpiral(){
+    if (!SP) return;
+    document.getElementById('spList').innerHTML = SP.rounds.map(function(ids, r){
+      var st = roundStat(r), full = st.ans === st.n;
+      return '<li><button type="button" data-round="' + r + '" class="' + ((S.mode === 'spiral' || S.mode === 'spfix') && S.round === r ? 'on ' : '') + (full ? 'done' : '') + '">第' + (r+1) + '周<small>' + (full ? '済 ' + st.ok + '/' + st.n + '正解' : st.ans ? st.ans + '/' + st.n + '問' : '未着手') + '</small></button></li>';
+    }).join('');
+  }
+  function renderStats(){
+    renderSpiral();
+    var all = stats();
+    document.getElementById('statHead').textContent = '分野別の成績（解答 ' + all.answered + '/' + qCards.length + '・最新 ' + pct(all.ok, all.answered) + '・初回 ' + pct(all.first, all.answered) + '）';
+    var RL = !!D.rateLabel;
+    document.getElementById('statBody').innerHTML = '<tr class="h"><td>分野</td>' + (RL ? '<td class="n">' + esc(D.rateLabel) + '</td>' : '') + '<td class="n">解答</td><td class="n">最新</td><td class="n">初回</td></tr>' +
+      D.sections.map(function(s){
+        var st = stats(s.id), weak = st.answered && st.ok/st.answered < 0.6;
+        return '<tr' + (weak ? ' class="weak"' : '') + '><td>' + esc(s.title) + '</td>' + (RL ? '<td class="n">' + esc(s.rate) + '</td>' : '') + '<td class="n">' + st.answered + '/' + st.n + '</td><td class="n">' + pct(st.ok, st.answered) + '</td><td class="n">' + pct(st.first, st.answered) + '</td></tr>';
+      }).join('');
+  }
+
+  function go(delta){
+    var dk = deck(), i = curIndex(dk) + delta;
+    if (i < 0) return;
+    S.cur = i >= dk.length ? '__done' : dk[i].id;
+    touch(); render(true);
+  }
+  function answer(orig){
+    var dk = deck(), c = dk[curIndex(dk)];
+    if (!c || c.type !== 'q' || revealed(c)) return;
+    if (isMulti(c)) {
+      var cur = (sel[c.id] || []).slice(), at = cur.indexOf(orig);
+      if (at >= 0) cur.splice(at, 1); else cur.push(orig);
+      sel[c.id] = cur;
+      if (cur.length < c.ans.length) { render(false); return; }
+      delete sel[c.id];
+      orig = cur.slice().sort();
+    }
+    var prev = S.answers[c.id];
+    var ok = isMulti(c) ? orig.length === c.ans.length && orig.every(function(o){ return c.ans.indexOf(o) >= 0; }) : orig === c.ans;
+    S.answers[c.id] = {c:orig, ok:ok, at:Date.now(), tries:(prev ? (prev.tries||1) : 0) + 1, first: prev ? prev.first : ok};
+    if (S.mode === 'wrong') S.pass[c.id] = 1;
+    touch(); render(false);
+    var exp = document.getElementById('exp');
+    if (exp) main.scrollTo({top: Math.max(0, exp.offsetTop - main.clientHeight * 0.35), behavior: 'smooth'});
+  }
+
+  function startRound(r, redo){
+    S.mode = 'spiral'; S.round = r; S.fix = null; sel = {};
+    if (redo) { S.roundAt = Object.assign({}, S.roundAt); S.roundAt[r] = Date.now(); }
+    var at = (S.roundAt||{})[r]||0;
+    var open = SP.rounds[r].filter(function(id){ var a = S.answers[id]; return !a || (a.at||0) < at; })[0];
+    S.cur = open || '__done'; touch(); render(true);
+  }
+  // 周の中で間違えた問題だけを、未解答の状態から解き直す。終わるたびに残りの不正解でもう一度回せる
+  function startFix(r){
+    var ids = roundMiss(r);
+    if (!ids.length) { startRound(r, false); return; }
+    S.mode = 'spfix'; S.round = r; S.fix = {r:r, ids:ids, at:Date.now()}; sel = {};
+    S.cur = ids[0]; touch(); render(true);
+  }
+  stage.addEventListener('click', function(e){
+    var b = e.target.closest('[data-act]'); if (!b) return;
+    var act = b.getAttribute('data-act');
+    if (act === 'next-round') startRound(S.round + 1, false);
+    else if (act === 'redo-round') startRound(S.round, true);
+    else if (act === 'fix-round') startFix(S.round);
+    else if (act === 'resume-round') startRound(S.round, false);
+  });
+  document.getElementById('spList').addEventListener('click', function(e){
+    var b = e.target.closest('[data-round]'); if (!b) return;
+    S.mode = 'spiral'; S.round = Number(b.getAttribute('data-round')); S.fix = null; sel = {}; S.cur = '__intro';
+    touch(); render(true); openSheet(false);
+  });
+  stage.addEventListener('toggle', function(e){
+    if (!e.target.classList || !e.target.classList.contains('scn')) return;
+    scnOpen = e.target.open; try { localStorage.setItem(SCN_KEY, scnOpen ? '1' : '0'); } catch(err) {}
+  }, true);
+  stage.addEventListener('click', function(e){
+    var b = e.target.closest('.opt'); if (b && !b.disabled) answer(Number(b.getAttribute('data-o')));
+  });
+  prevB.addEventListener('click', function(){ go(-1); });
+  nextB.addEventListener('click', function(){ go(1); });
+
+  // ── メニュー
+  var app = document.body;
+  function openSheet(v){ app.classList.toggle('open', v); }
+  document.getElementById('menuB').addEventListener('click', function(){ openSheet(true); });
+  document.getElementById('sheetBg').addEventListener('click', function(){ openSheet(false); });
+
+  document.querySelectorAll('[data-mode]').forEach(function(b){
+    b.addEventListener('click', function(){
+      var m = b.getAttribute('data-mode');
+      if (m === 'wrong') {
+        var wrongSecs = {}, ids = [];
+        qCards.forEach(function(c){ var a=S.answers[c.id]; if (a && !a.ok) wrongSecs[c.sec] = 1; });
+        D.cards.forEach(function(c){
+          var a = S.answers[c.id];
+          if (c.type === 'lesson' ? wrongSecs[c.sec] : (a && !a.ok)) ids.push(c.id);
+        });
+        S.wrongDeck = ids; S.pass = {}; S.cur = ids[0] || '__done';
+      } else if (m === 'mock') {
+        var pool = D.sections.filter(function(s){ return s.n >= MOCK.per; }).map(function(s){ return s.id; });
+        for (var i = pool.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)), tmp = pool[i]; pool[i] = pool[j]; pool[j] = tmp; }
+        var pick = pool.slice(0, MOCK.scenarios);
+        S.mockSecs = D.sections.map(function(s){ return s.id; }).filter(function(id){ return pick.indexOf(id) >= 0; });
+        S.mockAt = Date.now();
+        var first = qCards.filter(function(c){ return S.mockSecs.indexOf(c.sec) >= 0; })[0];
+        S.cur = first ? first.id : '__done';
+      } else if (S.mode !== 'all') {
+        var firstOpen = qCards.filter(function(c){ return !S.answers[c.id]; })[0];
+        S.cur = firstOpen ? firstOpen.id : '__done';
+      }
+      S.mode = m; touch(); render(true); openSheet(false);
+    });
+  });
+  var jump = document.getElementById('jump');
+  jump.innerHTML = '<option value="">分野を選ぶ</option>' + D.sections.map(function(s){ return '<option value="' + s.id + '">' + s.no + '. ' + esc(s.title) + '</option>'; }).join('');
+  jump.addEventListener('change', function(){
+    if (!jump.value) return;
+    var first = D.cards.filter(function(c){ return c.sec === jump.value; })[0];
+    S.mode = 'all'; S.cur = first ? first.id : 'L-' + jump.value; jump.value = ''; touch(); render(true); openSheet(false);
+  });
+  document.getElementById('reset').addEventListener('click', function(){
+    if (!confirm('すべての解答記録を消して、最初から解き直しますか？' + (SHARE ? '' : '（ほかの端末にも反映されます）'))) return;
+    S = Object.assign(blank(), {resetAt: Date.now()}); touch(); render(true); openSheet(false);
+  });
+
+  document.addEventListener('keydown', function(e){
+    if (e.target.closest && e.target.closest('input,select,textarea')) return;
+    if (e.metaKey || e.ctrlKey || e.altKey) return;
+    var k = e.key;
+    if (k === 'Escape') { openSheet(false); return; }
+    if (/^[1-5]$/.test(k) || /^[a-eA-E]$/.test(k)) {
+      var dk = deck(), c = dk[curIndex(dk)]; if (!c || c.type !== 'q') return;
+      var i = /^[1-5]$/.test(k) ? Number(k)-1 : 'abcde'.indexOf(k.toLowerCase());
+      if (i >= c.order.length) return;
+      answer(c.order[i]); e.preventDefault();
+    } else if (k === 'ArrowRight' || k === 'Enter') { if (!nextB.disabled) { go(1); e.preventDefault(); } }
+    else if (k === 'ArrowLeft') { if (!prevB.disabled) { go(-1); e.preventDefault(); } }
+  });
+
+  var sx = null, sy = null;
+  main.addEventListener('touchstart', function(e){ var t=e.touches[0]; sx=t.clientX; sy=t.clientY; }, {passive:true});
+  main.addEventListener('touchend', function(e){
+    if (sx === null) return; var t=e.changedTouches[0], dx=t.clientX-sx, dy=t.clientY-sy; sx=null;
+    if (Math.abs(dx) > 70 && Math.abs(dx) > Math.abs(dy) * 1.8) { if (dx < 0 && !nextB.disabled) go(1); else if (dx > 0 && !prevB.disabled) go(-1); }
+  }, {passive:true});
+
+  if (MOCK) { var mb = document.getElementById('mockB'); mb.textContent = '本番形式（' + MOCK.scenarios * MOCK.per + '問）'; document.getElementById('mockSeg').hidden = false; }
+  if (S.mode === 'mock' && !MOCK) S.mode = 'all';
+  if (SP) {
+    document.getElementById('spBox').hidden = false;
+    // 周回を初めて使う問題集は、解答の有無にかかわらず第1周の入口から始める（途中まで解いた記録は残る）
+    if (!S.spInit) { S.spInit = 1; S.mode = 'spiral'; S.round = 0; S.fix = null; S.cur = Object.keys(S.answers).length ? '__intro' : SP.rounds[0][0]; touch(); }
+    if (S.round >= SP.rounds.length) S.round = 0;
+    if (S.mode === 'spfix' && !(S.fix && S.fix.ids && S.fix.ids.length)) S.mode = 'spiral';
+  } else if (S.mode === 'spiral' || S.mode === 'spfix') S.mode = 'all';
+  render(true);
+  refresh();
+})();
+</script>
+</body>
+</html>
