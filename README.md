@@ -14,11 +14,11 @@ Python で書いた選択式の問題から、スマホでも PC でも解ける
 - **記録の保存**：既定はブラウザにだけ保存します。保存用のAPIを用意すれば、端末間で同期できます
 - **1枚の HTML**：外部のライブラリもサーバーも要りません。GitHub Pages などに置けばそのまま動き、ホーム画面に追加してアプリのように使えます
 
-見本：[example/python-basics.html](example/python-basics.html)（Python の基礎・21問）
+Python の基礎21問を収めた見本が [example/python-basics.html](example/python-basics.html) にあります。
 
 ## 入れ方
 
-Claude Desktop（Claude Code）に、このリポジトリの URL を渡して頼むだけです。
+Claude Desktop（Claude Code）に、このリポジトリの URL を渡して頼めば使えます。
 
 > https://github.com/minorun365/spiral-quiz-kit これで◯◯の問題集を作って
 
@@ -28,12 +28,12 @@ Claude Desktop（Claude Code）に、このリポジトリの URL を渡して�
 
 ユーザーから問題集づくりを頼まれた Claude Code は、次の手順で進めてください。自分で作る人も、同じ手順で作れます。
 
-1. **リポジトリを手元に置く。** `git clone https://github.com/minorun365/spiral-quiz-kit.git`
-2. **題材の範囲を分野に分ける。** 試験なら公式の出題範囲（試験ガイド）の分野をそのまま使います。1分野5問以上を目安にします
-3. **問題を書く。** `example/questions.py` を写して新しいフォルダに置き、`SECTIONS` を書き換えます。書き方は [docs/question-format.md](docs/question-format.md)。分野の中では大事な問題を先に書きます（前の周に入ります）
-4. **組み立てる。** `example/build.py` を写し、出力先・`key`・タイトルを変えて `python3 build.py` を実行します。未完成の項目があれば警告が出ます
-5. **開いて確かめる。** 書き出した HTML をブラウザで開き、第1周を解いて、解説と図が崩れていないかを見ます
-6. **ユーザーへ渡す。** HTML のパスを伝えます。公開するなら、静的ファイルを置ける場所（GitHub Pages など）へ置くだけです
+1. `git clone https://github.com/minorun365/spiral-quiz-kit.git` を実行して、リポジトリを手元に置きます。
+2. 題材の範囲を分野に分けます。試験なら公式の出題範囲（試験ガイド）の分野をそのまま使い、1分野5問以上を目安にします。
+3. `example/questions.py` を新しいフォルダへコピーして `SECTIONS` を書き換え、問題を書きます。書き方は [docs/question-format.md](docs/question-format.md) を参照してください。前の周に入るよう、分野の中では大事な問題を先に書きます。
+4. `example/build.py` をコピーして出力先・`key`・タイトルを変更し、`python3 build.py` を実行して組み立てます。未完成の項目があれば警告が出ます。
+5. 書き出した HTML をブラウザで開き、第1周を解いて、解説と図が崩れていないか確かめます。
+6. ユーザーへ HTML のパスを伝えます。公開するなら、GitHub Pages など静的ファイルを置ける場所へ置きます。
 
 画面の動き・周の組み方・同期のつなぎ方は [docs/how-it-works.md](docs/how-it-works.md) にあります。
 
@@ -44,4 +44,4 @@ Claude Desktop（Claude Code）に、このリポジトリの URL を渡して�
 
 ## ライセンス
 
-Apache License 2.0。[LICENSE](LICENSE) と [NOTICE](NOTICE) を参照してください。
+Apache License 2.0 です。[LICENSE](LICENSE) と [NOTICE](NOTICE) を参照してください。
